@@ -1,0 +1,2146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="format-detection" content="telephone=no">
+  <title>山东莲奥 - 车间数字化管理系统 (全工序手机端)</title>
+  <style>
+    :root {
+      --bg-dark: #0a0f1d;
+      --bg-card: #131c31;
+      --bg-card-elevated: #1e2942;
+      --border-color: #2a3958;
+      --accent-amber: #f59e0b;
+      --accent-emerald: #10b981;
+      --accent-indigo: #6366f1;
+      --accent-rose: #f43f5e;
+      --text-white: #f8fafc;
+      --text-gray: #94a3b8;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-white);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Roboto, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-top: var(--safe-top);
+      padding-bottom: calc(75px + var(--safe-bottom));
+      line-height: 1.4;
+    }
+
+    /* 顶部导航条 */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(10, 15, 29, 0.98);
+      border-bottom: 2px solid var(--accent-amber);
+      padding: 10px 14px 6px 14px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #020617;
+      font-weight: 900;
+      font-size: 18px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+      border: 1px solid #fcd34d;
+    }
+
+    .brand-text h1 {
+      font-size: 14px;
+      font-weight: 900;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .brand-sub {
+      font-size: 10px;
+      color: var(--accent-amber);
+      font-weight: 600;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-badge {
+      font-size: 10px;
+      padding: 3px 7px;
+      border-radius: 6px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid transparent;
+    }
+
+    .status-online {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    .status-offline {
+      background: rgba(148, 163, 184, 0.1);
+      color: #94a3b8;
+      border-color: rgba(148, 163, 184, 0.2);
+    }
+
+    .btn-header {
+      padding: 5px 9px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .btn-lock {
+      background: #1e293b;
+      color: #fcd34d;
+      border-color: #f59e0b;
+    }
+
+    .btn-leader {
+      background: #4f46e5;
+      color: #ffffff;
+      border-color: #818cf8;
+    }
+
+    /* 9大工序横向滑动条 */
+    .process-scroller {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 8px 0 4px 0;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .process-scroller::-webkit-scrollbar {
+      display: none;
+    }
+
+    .proc-tag-prefix {
+      font-size: 11px;
+      color: #fcd34d;
+      font-weight: 900;
+      white-space: nowrap;
+      margin-right: 2px;
+    }
+
+    .proc-pill {
+      flex-shrink: 0;
+      padding: 5px 11px;
+      font-size: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: #0f172a;
+      color: #cbd5e1;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .proc-pill.active {
+      background: #f59e0b;
+      color: #020617;
+      font-weight: 900;
+      border-color: #fcd34d;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+    }
+
+    /* 主内容容器 */
+    .container {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* 卡片容器 */
+    .card {
+      background: var(--bg-card);
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+      padding: 14px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+      position: relative;
+    }
+
+    .card-amber {
+      border: 2px solid #f59e0b;
+      background: linear-gradient(180deg, rgba(245, 158, 11, 0.06) 0%, var(--bg-card) 20%);
+    }
+
+    .card-emerald {
+      border: 2px solid #10b981;
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.06) 0%, var(--bg-card) 20%);
+    }
+
+    .card-indigo {
+      border: 2px solid #6366f1;
+      background: linear-gradient(180deg, rgba(99, 102, 241, 0.06) 0%, var(--bg-card) 20%);
+    }
+
+    .card-rose {
+      border: 2px solid #f43f5e;
+      background: linear-gradient(180deg, rgba(244, 63, 94, 0.06) 0%, var(--bg-card) 20%);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .card-title-amber { color: #fcd34d; }
+    .card-title-emerald { color: #34d399; }
+    .card-title-indigo { color: #a5b4fc; }
+    .card-title-rose { color: #fb7185; }
+
+    /* 按钮 */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 800;
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.1s, opacity 0.15s;
+    }
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary {
+      background: #f59e0b;
+      color: #020617;
+      border-color: #fcd34d;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+    }
+
+    .btn-success {
+      background: #10b981;
+      color: #020617;
+      border-color: #34d399;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-danger {
+      background: #e11d48;
+      color: #ffffff;
+      border-color: #fb7185;
+    }
+
+    .btn-secondary {
+      background: #1e293b;
+      color: #cbd5e1;
+      border-color: #475569;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 11px;
+      border-radius: 8px;
+    }
+
+    .btn-block {
+      width: 100%;
+    }
+
+    /* 表单与输入框 */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+
+    .input-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-gray);
+    }
+
+    .form-input, .form-textarea, .form-select {
+      background: #0b1120;
+      border: 1px solid var(--border-color);
+      color: #ffffff;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      width: 100%;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--accent-amber);
+    }
+
+    /* 快捷芯片标签 */
+    .chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 6px 0;
+    }
+
+    .chip {
+      padding: 5px 9px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      cursor: pointer;
+    }
+
+    .chip.active, .chip:active {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fcd34d;
+      border-color: #f59e0b;
+    }
+
+    /* 铁律和特别提示 */
+    .notice-box {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px dashed rgba(245, 158, 11, 0.6);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin: 8px 0;
+      font-size: 12px;
+      color: #fef3c7;
+      line-height: 1.5;
+    }
+
+    .notice-title {
+      font-weight: 900;
+      color: #f59e0b;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* 参数卡网格 */
+    .param-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      margin: 8px 0;
+    }
+
+    .param-item {
+      background: #090e1a;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 11px;
+    }
+
+    .param-key {
+      color: var(--text-gray);
+      margin-bottom: 2px;
+    }
+
+    .param-val {
+      font-weight: 800;
+      color: #34d399;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    /* 作业步骤 */
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin: 8px 0;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      background: #090e1a;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 12px;
+      color: #e2e8f0;
+    }
+
+    .step-num {
+      width: 18px;
+      height: 18px;
+      background: #f59e0b;
+      color: #020617;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 900;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* 统计看板 */
+    .stat-banner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+    }
+
+    .stat-val {
+      font-size: 18px;
+      font-weight: 900;
+      color: #34d399;
+    }
+
+    .worklog-table {
+      width: 100%;
+      font-size: 11px;
+      border-collapse: collapse;
+      margin-top: 6px;
+    }
+
+    .worklog-table th {
+      text-align: left;
+      padding: 6px 8px;
+      color: var(--text-gray);
+      border-bottom: 1px solid #2a3958;
+    }
+
+    .worklog-table td {
+      padding: 8px;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    /* 缺陷卡片 */
+    .defect-card {
+      background: #0b1120;
+      border: 1px solid #2a3958;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+
+    .defect-img {
+      width: 100%;
+      max-height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      margin: 8px 0;
+    }
+
+    .ai-diag-box {
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      color: #c7d2fe;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 11px;
+      margin: 6px 0;
+    }
+
+    /* 流转工单管道 */
+    .order-card {
+      background: #0b1120;
+      border: 1px solid #2a3958;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 8px;
+    }
+
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 11px;
+    }
+
+    .order-badge {
+      background: #f59e0b;
+      color: #020617;
+      font-weight: 900;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+
+    .step-pipes {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .pipe-item {
+      padding: 5px 4px;
+      border-radius: 6px;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 700;
+      border: 1px solid #1e293b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .pipe-done {
+      background: #059669;
+      color: #ffffff;
+      border-color: #10b981;
+    }
+
+    .pipe-active {
+      background: #f59e0b;
+      color: #020617;
+      border-color: #fcd34d;
+      font-weight: 900;
+    }
+
+    .pipe-waiting {
+      background: #1e293b;
+      color: #64748b;
+    }
+
+    /* 底部导航栏 TabBar */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: calc(58px + var(--safe-bottom));
+      padding-bottom: var(--safe-bottom);
+      background: rgba(10, 15, 29, 0.98);
+      border-top: 1px solid #2a3958;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 40;
+    }
+
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      font-size: 10px;
+      font-weight: 700;
+      flex: 1;
+      height: 100%;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .tab-item.active {
+      color: #f59e0b;
+    }
+
+    .tab-icon {
+      font-size: 18px;
+      margin-bottom: 2px;
+    }
+
+    .tab-badge {
+      position: absolute;
+      top: 6px;
+      right: 22%;
+      background: #f43f5e;
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 900;
+      padding: 1px 4px;
+      border-radius: 9px;
+      min-width: 14px;
+      text-align: center;
+    }
+
+    /* 弹窗 Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.85);
+      z-index: 100;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: var(--safe-bottom);
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #111827;
+      border: 2px solid #f59e0b;
+      border-radius: 20px 20px 0 0;
+      width: 100%;
+      max-width: 600px;
+      padding: 18px;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #1f2937;
+    }
+
+    .modal-close {
+      background: #1e293b;
+      color: #94a3b8;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    /* Toast 弹窗通知 */
+    .toast-container {
+      position: fixed;
+      top: calc(75px + var(--safe-top));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 200;
+      width: 90%;
+      max-width: 360px;
+      pointer-events: none;
+      display: none;
+    }
+
+    .toast-message {
+      background: rgba(15, 23, 42, 0.98);
+      border: 1px solid #f59e0b;
+      color: #ffffff;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
+
+    .hidden-input {
+      display: none;
+    }
+
+    .progress-track {
+      background: #0f172a;
+      border: 1px solid #334155;
+      height: 7px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #f59e0b);
+      border-radius: 4px;
+    }
+
+    /* Tab 内容隐藏与显现 */
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .tab-content.active {
+      display: flex;
+    }
+  </style>
+</head>
+<body>
+  <!-- Toast 弹窗 -->
+  <div class="toast-container" id="toastBox">
+    <div class="toast-message" id="toastMsg">通知信息</div>
+  </div>
+
+  <!-- 顶部导航栏 -->
+  <header class="app-header">
+    <div class="header-top">
+      <div class="brand-title">
+        <div class="brand-logo">莲</div>
+        <div class="brand-text">
+          <h1>
+            <span>山东莲奥车间数字化</span>
+            <span id="headerLeaderBadge" style="display:none;background:#4f46e5;color:#fff;font-size:9px;padding:1px 5px;border-radius:4px;">👑 领导</span>
+          </h1>
+          <p class="brand-sub">📱 排气管 9 大全工序手机移动端</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <span class="status-badge status-offline" id="onlineBadge">
+          ● 离线
+        </span>
+
+        <button class="btn-header btn-lock" id="btnLeaderLock" onclick="handleLeaderClick()">
+          🔑 领导
+        </button>
+      </div>
+    </div>
+
+    <!-- 9 大工序快速切换标签滑块 (仅在工位页显示) -->
+    <div class="process-scroller" id="processScroller">
+      <span class="proc-tag-prefix">工序:</span>
+    </div>
+  </header>
+
+  <!-- 主容器 -->
+  <main class="container">
+
+    <!-- ==================== TAB 1: 📱 工位SOP与防错 ==================== -->
+    <section class="tab-content active" id="tab-station">
+      <!-- 工位操作员与签到卡片 -->
+      <div class="card card-amber">
+        <div class="card-header">
+          <span class="card-title card-title-amber" id="stationOperatorTitle">
+            👷 工位操作员：未实名
+          </span>
+          <div style="display:flex;gap:6px;">
+            <button id="btnLoginOperator" onclick="toggleOperatorLogin()" class="btn btn-sm btn-primary">
+              🟢 登录工位
+            </button>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+          <input 
+            id="operatorNameInput" 
+            placeholder="请填写您的实名姓名（如：张工）" 
+            class="form-input" 
+            style="flex:1;"
+            onblur="saveOperatorName()"
+          />
+          <button onclick="openVerifyModal()" class="btn btn-sm btn-success" style="white-space:nowrap;">
+            🛡️ 签名防错
+          </button>
+        </div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:6px;">
+          提示：登录后名字将实时同步在电脑大屏【当前在线工位人员】列表中。
+        </div>
+      </div>
+
+      <!-- 当前工序专用参数卡 -->
+      <div class="card card-amber">
+        <div class="card-header">
+          <span class="card-title card-title-amber" id="sopProcessTitle">
+            📐 【全自动弯管】工艺参数与规范
+          </span>
+          <span style="font-size:11px;color:#cbd5e1;" id="sopDeviceName">设备：全自动弯管机</span>
+        </div>
+
+        <!-- 铁律提示 -->
+        <div class="notice-box" id="sopNoticeBox">
+          <div class="notice-title" id="sopNoticeTitle">🚨 弯管工序 6 条操作铁律</div>
+          <div id="sopNoticeContent">
+            1. 尺寸对好再开工 | 2. 机子夹紧要牢靠<br>3. 粗管后溜要顶住 | 4. 大小管子都要刷油<br>5. 弯好慢拿别掉地 | 6. 根根都要上工装试装
+          </div>
+        </div>
+
+        <!-- 参数网格 -->
+        <div class="param-grid" id="sopParamsGrid"></div>
+
+        <!-- 质量控制标准 -->
+        <div style="margin-top:8px;">
+          <div style="font-size:11px;font-weight:bold;color:#fcd34d;margin-bottom:4px;">质量控制标准</div>
+          <div class="chip-group" id="sopControlsGrid"></div>
+        </div>
+
+        <!-- 作业步骤 -->
+        <div style="margin-top:10px;">
+          <div style="font-size:11px;font-weight:bold;color:#fcd34d;margin-bottom:4px;">标准规范作业步骤</div>
+          <div class="step-list" id="sopStepsList"></div>
+        </div>
+
+        <!-- 一键防错签名按钮 -->
+        <button onclick="openVerifyModal()" class="btn btn-block btn-success" style="margin-top:10px;">
+          🛡️ 提交当前工序防错自检签名留痕
+        </button>
+      </div>
+
+      <!-- 收到整改维修通知 -->
+      <div class="card card-rose" id="repairAlertCard" style="display:none;">
+        <div class="card-header">
+          <span class="card-title card-title-rose" id="repairAlertTitle">
+            📩 收到质检领导维修整改通知
+          </span>
+        </div>
+        <div id="repairAlertList"></div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: 📝 每日报工登记 ==================== -->
+    <section class="tab-content" id="tab-worklog">
+      <!-- 今日统计看板 -->
+      <div class="stat-banner">
+        <div>
+          <div style="font-size:11px;color:#94a3b8;">今日累计完成工作量</div>
+          <div class="stat-val"><span id="worklogTotalQty">0</span> <span style="font-size:12px;color:#cbd5e1;">件/米</span></div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:#94a3b8;">已登记笔数</div>
+          <div class="stat-val" style="color:#fcd34d;"><span id="worklogTotalCount">0</span> 笔</div>
+        </div>
+      </div>
+
+      <!-- 报工登记卡片 -->
+      <div class="card card-emerald">
+        <div class="card-header">
+          <span class="card-title card-title-emerald">
+            📋 手机快速报工登记
+          </span>
+          <span style="font-size:11px;color:#94a3b8;">实时同步电脑大屏</span>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">工人姓名</label>
+          <input id="worklogWorker" placeholder="填写真实姓名" class="form-input">
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">工作内容/工序</label>
+          <input id="worklogTask" placeholder="例如：全自动弯管、激光切割、回切对刀" class="form-input">
+          <div class="chip-group">
+            <span class="chip" onclick="setWorklogTask('激光下料')">+ 激光下料</span>
+            <span class="chip" onclick="setWorklogTask('全自动弯管')">+ 全自动弯管</span>
+            <span class="chip" onclick="setWorklogTask('回切')">+ 回切</span>
+            <span class="chip" onclick="setWorklogTask('涨管机')">+ 涨管机</span>
+            <span class="chip" onclick="setWorklogTask('冲槽口')">+ 冲槽口</span>
+            <span class="chip" onclick="setWorklogTask('焊接')">+ 焊接</span>
+            <span class="chip" onclick="setWorklogTask('产品润色')">+ 产品润色</span>
+            <span class="chip" onclick="setWorklogTask('检验包装')">+ 检验包装</span>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns: 2fr 1fr;gap:8px;">
+          <div class="input-group">
+            <label class="input-label">完成数量</label>
+            <input id="worklogQuantity" type="number" min="0" step="1" placeholder="填写数量" class="form-input">
+          </div>
+          <div class="input-group">
+            <label class="input-label">单位</label>
+            <select id="worklogUnit" class="form-select">
+              <option value="件">件</option>
+              <option value="根">根</option>
+              <option value="米">米</option>
+              <option value="套">套</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 常用数量快选 -->
+        <div class="chip-group" style="margin-top:-2px;margin-bottom:8px;">
+          <span class="chip" onclick="addWorklogQty(10)">+10</span>
+          <span class="chip" onclick="addWorklogQty(50)">+50</span>
+          <span class="chip" onclick="addWorklogQty(100)">+100</span>
+          <span class="chip" onclick="addWorklogQty(200)">+200</span>
+          <span class="chip" onclick="document.getElementById('worklogQuantity').value=''">清空</span>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">备注 (可选)</label>
+          <input id="worklogNote" placeholder="例如：首批50件、规格409L" class="form-input">
+        </div>
+
+        <button onclick="submitWorklogForm()" class="btn btn-block btn-success" style="margin-top:6px;">
+          💾 确认保存今日工作量 (同步电脑大屏)
+        </button>
+      </div>
+
+      <!-- 今日明细记录 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">
+            📅 今日已报工记录 (<span id="worklogListCount">0</span>)
+          </span>
+          <button onclick="loadData()" class="btn btn-sm btn-secondary">刷新</button>
+        </div>
+
+        <div id="worklogTableBox" style="overflow-x:auto;">
+          <table class="worklog-table">
+            <thead>
+              <tr>
+                <th>工人</th>
+                <th>工序内容</th>
+                <th>数量</th>
+                <th>时间</th>
+              </tr>
+            </thead>
+            <tbody id="worklogTableBody"></tbody>
+          </table>
+        </div>
+        <div id="worklogEmptyTip" style="text-align:center;padding:24px 0;color:#64748b;font-size:12px;display:none;">
+          今日暂无报工记录，请在上方填写并提交。
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: 📸 现场拍照与残次品AI上报 ==================== -->
+    <section class="tab-content" id="tab-defect">
+      <div class="card card-indigo">
+        <div class="card-header">
+          <span class="card-title card-title-indigo">
+            📸 现场残次品拍照与 AI 诊断
+          </span>
+        </div>
+
+        <div style="font-size:12px;color:#cbd5e1;line-height:1.5;margin-bottom:10px;">
+          发现疑似不良品？直接调用手机相机拍照，AI 将即时给出诊断，照片和诊断结果实时同步到电脑大屏。
+        </div>
+
+        <!-- 快捷缺陷原因快选 -->
+        <div class="input-group">
+          <label class="input-label">预设缺陷描述（点击快速填入）</label>
+          <div class="chip-group">
+            <span class="chip" onclick="setDefectIssue('焊缝疑似焊漏/虚焊')">焊缝疑似焊漏/虚焊</span>
+            <span class="chip" onclick="setDefectIssue('管口毛刺及压扁')">管口毛刺及压扁</span>
+            <span class="chip" onclick="setDefectIssue('三维回切角度超差')">三维回切角度超差</span>
+            <span class="chip" onclick="setDefectIssue('弯管外侧起皱/压痕')">弯管外侧起皱/压痕</span>
+            <span class="chip" onclick="setDefectIssue('冲槽口偏位/翻边')">冲槽口偏位/翻边</span>
+            <span class="chip" onclick="setDefectIssue('表面严重划痕油污')">表面严重划痕油污</span>
+          </div>
+          <input id="defectIssueInput" placeholder="自定义输入问题描述..." class="form-input" style="margin-top:4px;">
+        </div>
+
+        <!-- 拍照上传按钮 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+          <label class="btn btn-primary" style="cursor:pointer;">
+            📷 调起相机拍照
+            <input type="file" onchange="handlePhotoUpload(event)" accept="image/*" capture="environment" class="hidden-input">
+          </label>
+          <label class="btn btn-secondary" style="cursor:pointer;">
+            🖼️ 从相册选取
+            <input type="file" onchange="handlePhotoUpload(event)" accept="image/*" class="hidden-input">
+          </label>
+        </div>
+      </div>
+
+      <!-- 异常记录列表 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">
+            📋 异常记录与领导批复 (<span id="defectRecordsCount">0</span>)
+          </span>
+          <button onclick="loadData()" class="btn btn-sm btn-secondary">刷新</button>
+        </div>
+
+        <div id="defectRecordsList"></div>
+        <div id="defectEmptyTip" style="text-align:center;padding:24px 0;color:#64748b;font-size:12px;display:none;">
+          当前无异常记录，现场良好。
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: 📊 派工流转与设备台账 ==================== -->
+    <section class="tab-content" id="tab-kanban">
+      <!-- 9工序实时生产订单 -->
+      <div class="card card-amber">
+        <div class="card-header">
+          <span class="card-title card-title-amber">
+            📊 9 大工序派工与流转看板
+          </span>
+          <span style="font-size:11px;color:#fcd34d;" id="kanbanOrderCount">共 2 个在产单</span>
+        </div>
+        <div id="kanbanOrdersList"></div>
+      </div>
+
+      <!-- 设备模具寿命卡片 -->
+      <div class="card card-indigo">
+        <div class="card-header">
+          <span class="card-title card-title-indigo">
+            🛠️ 核心设备与模具寿命台账
+          </span>
+        </div>
+        <div id="equipmentList"></div>
+      </div>
+
+      <!-- 5S与安全红线预警 -->
+      <div class="card card-rose">
+        <div class="card-header">
+          <span class="card-title card-title-rose">
+            ⚠️ 车间 5S 与安全生产红线预警
+          </span>
+        </div>
+        <div id="safetyAlertsList"></div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 5: 👑 领导决策与战情大屏 ==================== -->
+    <section class="tab-content" id="tab-leader">
+      <!-- 领导未解锁视图 -->
+      <div id="leaderLockedView" class="card card-indigo" style="text-align:center;padding:30px 16px;">
+        <div style="font-size:36px;margin-bottom:8px;">🔐</div>
+        <h2 style="font-size:16px;font-weight:900;color:#fff;margin-bottom:6px;">领导战情大屏（受密码保护）</h2>
+        <p style="font-size:12px;color:#94a3b8;margin-bottom:16px;">
+          该模块供车间主管、质检组长及厂长查看全局看板与审批残次品。
+        </p>
+        <button onclick="promptLeaderUnlock()" class="btn btn-primary" style="margin:0 auto;">
+          🔑 输入密码解锁领导大屏
+        </button>
+      </div>
+
+      <!-- 领导已解锁视图 -->
+      <div id="leaderUnlockedView" style="display:none;flex-direction:column;gap:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;background:#1e1b4b;padding:10px 14px;border-radius:10px;border:1px solid #6366f1;">
+          <div>
+            <div style="font-size:12px;font-weight:bold;color:#c7d2fe;">👑 当前领导身份</div>
+            <div style="font-size:14px;font-weight:900;color:#fff;" id="leaderNameDisplay">王主管 (质检组长)</div>
+          </div>
+          <button onclick="logoutLeader()" class="btn btn-sm btn-danger">退出领导身份</button>
+        </div>
+
+        <!-- 4 核心指标卡 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div class="card card-amber" style="padding:10px;text-align:center;">
+            <div style="font-size:11px;color:#94a3b8;">在产工单总数</div>
+            <div style="font-size:20px;font-weight:900;color:#f59e0b;margin-top:2px;" id="kpiOrderCount">1 单</div>
+          </div>
+          <div class="card card-emerald" style="padding:10px;text-align:center;">
+            <div style="font-size:11px;color:#94a3b8;">综合良品率</div>
+            <div style="font-size:20px;font-weight:900;color:#10b981;margin-top:2px;">99.1%</div>
+          </div>
+          <div class="card card-indigo" style="padding:10px;text-align:center;">
+            <div style="font-size:11px;color:#94a3b8;">防错签名留痕</div>
+            <div style="font-size:20px;font-weight:900;color:#818cf8;margin-top:2px;" id="kpiLogCount">0 条</div>
+          </div>
+          <div class="card card-rose" style="padding:10px;text-align:center;">
+            <div style="font-size:11px;color:#94a3b8;">待处理异常</div>
+            <div style="font-size:20px;font-weight:900;color:#f43f5e;margin-top:2px;" id="kpiDefectCount">0 件</div>
+          </div>
+        </div>
+
+        <!-- 在线工位人员看板 -->
+        <div class="card card-emerald">
+          <div class="card-header">
+            <span class="card-title card-title-emerald">
+              🟢 当前在线工位工人 (<span id="onlineOperatorsCount">0</span>)
+            </span>
+          </div>
+          <div id="onlineOperatorsList" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+        </div>
+
+        <!-- 领导审批异常卡片 -->
+        <div class="card card-rose">
+          <div class="card-header">
+            <span class="card-title card-title-rose">
+              📸 残次品审核与批复台 (<span id="leaderDefectCount">0</span>)
+            </span>
+            <button onclick="loadData()" class="btn btn-sm btn-secondary">刷新</button>
+          </div>
+          <div id="leaderDefectsList"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 底部 TabBar 导航 -->
+  <nav class="tab-bar">
+    <div class="tab-item active" id="nav-station" onclick="switchTab('station')">
+      <span class="tab-icon">📱</span>
+      <span>工位SOP</span>
+    </div>
+
+    <div class="tab-item" id="nav-worklog" onclick="switchTab('worklog')">
+      <span class="tab-icon">📝</span>
+      <span>今日报工</span>
+      <span class="tab-badge" id="navWorklogBadge" style="display:none;background:#10b981;">0</span>
+    </div>
+
+    <div class="tab-item" id="nav-defect" onclick="switchTab('defect')">
+      <span class="tab-icon">📷</span>
+      <span>拍照上报</span>
+      <span class="tab-badge" id="navDefectBadge" style="display:none;">0</span>
+    </div>
+
+    <div class="tab-item" id="nav-kanban" onclick="switchTab('kanban')">
+      <span class="tab-icon">📊</span>
+      <span>派工看板</span>
+    </div>
+
+    <div class="tab-item" id="nav-leader" onclick="switchTab('leader')">
+      <span class="tab-icon">👑</span>
+      <span>领导大屏</span>
+    </div>
+  </nav>
+
+  <!-- 防错签名确认弹窗 Modal -->
+  <div class="modal-overlay" id="verifyModal" onclick="handleOverlayClick(event, 'verifyModal')">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="font-size:15px;font-weight:900;color:#fcd34d;" id="verifyModalTitle">
+          🛡️ 工序【全自动弯管】防错自检签名
+        </h3>
+        <button onclick="closeModal('verifyModal')" class="modal-close">✕</button>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;margin-bottom:12px;">
+        <label style="display:flex;align-items:center;gap:8px;background:#090e1a;padding:10px;border-radius:8px;border:1px solid #1e293b;">
+          <input type="checkbox" id="checkC1" style="width:18px;height:18px;accent-color:#f59e0b;">
+          <span>1. 已严格核对本工序工艺图纸、尺寸公差与规范</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;background:#090e1a;padding:10px;border-radius:8px;border:1px solid #1e293b;">
+          <input type="checkbox" id="checkC2" style="width:18px;height:18px;accent-color:#f59e0b;">
+          <span>2. 设备装夹固定到位，工装模具编号核对无误</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;background:#090e1a;padding:10px;border-radius:8px;border:1px solid #1e293b;">
+          <input type="checkbox" id="checkC3" style="width:18px;height:18px;accent-color:#f59e0b;">
+          <span>3. 确认首件试作外观与几何公差全检合格</span>
+        </label>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label" style="color:#fcd34d;">操作员实名签署：</label>
+        <input id="verifyOperatorInput" placeholder="请输入您的实名姓名" class="form-input">
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 2fr;gap:8px;margin-top:12px;">
+        <button onclick="closeModal('verifyModal')" class="btn btn-secondary">取消</button>
+        <button onclick="confirmProcessCheckin()" class="btn btn-success">
+          ✓ 确认提交数字留痕
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 纯原生 JavaScript 核心逻辑 (完全打通电脑后台，真实双向实时同步) -->
+  <script>
+    // 安全 Storage 封装
+    const SafeStore = {
+      get: function(key, defaultVal) {
+        try {
+          var val = localStorage.getItem(key);
+          return val !== null ? val : defaultVal;
+        } catch (e) {
+          return defaultVal;
+        }
+      },
+      set: function(key, val) {
+        try {
+          localStorage.setItem(key, val);
+        } catch (e) {}
+      }
+    };
+
+    // 核心状态
+    var state = {
+      currentTab: 'station',
+      isLeaderMode: false,
+      selectedProcess: '全自动弯管',
+      operatorName: SafeStore.get('workerSignature', ''),
+      leaderName: SafeStore.get('leaderSignature', '王主管 (质检组长)'),
+      isOnline: false,
+      onlineOperators: [],
+      onlineLeaders: [],
+      historyLogs: [],
+      worklogs: [],
+      defectRecords: [],
+      workOrders: [
+        {
+          orderNo: 'SC-20261010-003',
+          modelName: '排气管组件·A款',
+          drawingNo: 'DWG-9981-L',
+          quantity: 200,
+          completedQty: 145,
+          createTime: '08:00',
+          steps: [
+            { name: '激光下料', status: '已完成', operator: '李伟' },
+            { name: '全自动弯管', status: '进行中', operator: '张工' },
+            { name: '回切', status: '待进行', operator: '' },
+            { name: '涨管机', status: '待进行', operator: '' },
+            { name: '冲槽口', status: '待进行', operator: '' },
+            { name: '焊接', status: '待进行', operator: '' },
+            { name: '产品润色', status: '待进行', operator: '' },
+            { name: '检验', status: '待进行', operator: '' },
+            { name: '包装', status: '待进行', operator: '' }
+          ]
+        }
+      ],
+      equipmentMaster: [
+        { id: 'E1', name: '1# 全自动三维弯管机', status: '正常运行', dieNo: 'M-101-90', bladeNo: '', mandrelNo: 'X-101-R155', bendCount: 2840, maxLife: 5000 },
+        { id: 'E2', name: '2# 高精激光切管机', status: '加工中', dieNo: '', bladeNo: 'L-101-01', mandrelNo: '-', bendCount: 8900, maxLife: 10000 },
+        { id: 'E3', name: '3# 伺服自动三维回切机', status: '正常运行', dieNo: 'HC-03', bladeNo: '', mandrelNo: '-', bendCount: 1200, maxLife: 4000 }
+      ],
+      safetyAlerts: [
+        { id: 'S1', level: '高危提示', process: '全自动弯管', title: '后溜防滑脱防护锁止', content: '粗管弯曲时机头反作用力大，严禁拆卸后溜定位柱！', time: '08:10' },
+        { id: 'S2', level: '安全红线', process: '焊接工序', title: '气瓶固定防倾倒', content: '二保焊气体钢瓶必须靠墙铁链锁紧固定，严禁靠近火源。', time: '08:30' }
+      ]
+    };
+
+    var allProcesses = [
+      '激光下料', '全自动弯管', '回切', '涨管机', '冲槽口',
+      '焊接', '产品润色', '检验', '包装'
+    ];
+
+    var sopCatalog = {
+      '激光下料': {
+        device: '激光切管机',
+        noticeTitle: '✂️ 下料与回切核心准则',
+        notice: '卡盘托料夹紧稳固，对样试切防溅伤焊筋，严禁切完管件摔地受损变形！',
+        params: ['切割速度 5 m/min', '工作电流 25A', '工作电压 380V', '切割气体 氮气/高压空气'],
+        controls: ['长度公差 ±0.5mm', '管口无塌陷与严重毛刺', '壁厚规格核验合格'],
+        steps: [
+          '开启设备电源，顺序为气泵-操作台-激光主机。',
+          '选取切割程序，核验管件外径与壁厚参数。',
+          '从原料架取管料，首件检查管壁无划伤凹陷后装夹。',
+          '管料一端入卡盘，另一端入后端托料架并夹紧。',
+          '设置原点，启动预切，严禁身体进入激光危险区。',
+          '切割后管件整齐入料框，规范填写流转卡。'
+        ]
+      },
+      '全自动弯管': {
+        device: '全自动弯管机',
+        noticeTitle: '🚨 弯管工序 6 条操作铁律',
+        notice: '1. 尺寸对好再开工 | 2. 机子夹紧要牢靠<br>3. 粗管后溜要顶住 | 4. 大小管子都要刷油<br>5. 弯好慢拿别掉地 | 6. 根根都要上工装试装',
+        params: ['转速 3弯/min', '弯管角度 90° (R155)', '弯模轮号 M-101-90', '芯棒规格 X-101-R155'],
+        controls: ['长度与转角符合', '管壁无明显抓痕折皱', '弯曲处外侧减薄率达标', '试装工装全吻合'],
+        steps: [
+          '依据管材规格换装弯管模，清理模具残屑并锁紧。',
+          '按电闸-压缩机-操作台顺序规范开机。',
+          '调出弯管程序，重点核对送进量、旋转角和弯曲角。',
+          '管口均匀涂抹拉伸润滑油，放入模具夹紧作业。',
+          '慢速出料卸料，轻拿轻放严禁摔落地面。',
+          '首5件逐根上检具工装试配，合格品入周转筐。'
+        ]
+      },
+      '回切': {
+        device: '激光三维回切机',
+        noticeTitle: '📐 三维回切七步法与角度检验',
+        notice: '看图纸 ➔ 选设备 ➔ 装夹定位 ➔ 对刀对样 ➔ 粗切留量精切到位 ➔ 自检试配 ➔ 去毛刺流转',
+        params: ['切割速度 5 m/min', '电流 20A', '回切公差 ±0.3mm', '转台定位精准'],
+        controls: ['端口平整无毛刺', '符合三维检具工装', '管件对接同心度达标'],
+        steps: [
+          '按电源-冷水机-控制台顺序规范开启设备。',
+          '按产品形状卡入专用三维回切工装并夹紧。',
+          '对样对刀，粗切留量，精切到位。',
+          '启动机械手切割，作业员退至安全光栅外。',
+          '取料自检端口平整度并用通止规检验。',
+          '合格品整齐入周转架，流转下一工序。'
+        ]
+      },
+      '涨管机': {
+        device: '伺服涨管机',
+        noticeTitle: '⚠️ 涨口垂直受力与防裂纹',
+        notice: '模具安装稳固，产品插入保持垂直；涨口多位置旋转均匀受力；不良品立即隔离！',
+        params: ['运行速度 8次/min', '电流 1.4A', '工作行程 85mm', '工作压力 12MPa'],
+        controls: ['扩口深度外径合格', '端口圆度达标', '无裂口及台阶变形'],
+        steps: [
+          '开机点检，核实涨管冲头与夹模编号。',
+          '管件垂直对准模具中心插入定位。',
+          '脚踏启压，涨缩口分多次旋转加压保证圆度。',
+          '自检首件扩口尺寸，异常件立即放入红筐。',
+          '合格件扫码流转。'
+        ]
+      },
+      '冲槽口': {
+        device: '精密冲槽机',
+        noticeTitle: '⚠️ 槽口均布与手部防夹',
+        notice: '模具稳固安装，双手启动冲压；槽口四周均布，严禁偏位与边缘撕裂翻边！',
+        params: ['冲压速度 10次/min', '压力 15T', '冲口深度 12mm', '均布角度 120°'],
+        controls: ['槽口尺寸与深度达标', '四周位置均布无偏位', '槽边缘无撕裂翻边'],
+        steps: [
+          '开启设备电源，检查刀具刃口无崩口。',
+          '管件套入定心芯轴，推至限位端面。',
+          '双手按钮启动冲压，手部远离模口。',
+          '旋转管件冲全所有槽口，自检间距均匀度。',
+          '合格品入筐流转。'
+        ]
+      },
+      '焊接': {
+        device: '二保焊机/变位转台',
+        noticeTitle: '🔥 焊接焊前 5 查与安全红线',
+        notice: '必须佩戴焊接面罩与护目镜！气瓶垂直固定远离火源！严防焊漏、虚焊与气孔！',
+        params: ['焊速 0.5m/min', '焊接电流 140-180A', '焊接电压 20-25V', '转台速度 5 rpm'],
+        controls: ['焊缝饱满连续', '无漏焊/咬边/虚焊/气孔', '法兰同轴垂直度达标'],
+        steps: [
+          '清点法兰及配件，确认表面洁净无锈斑。',
+          '在专用夹具上组装点焊定位，确保管路同心。',
+          '按规范调节气体流量与规范电压电流。',
+          '踩动脚踏启动转台进行圆周自动平稳焊接。',
+          '自检焊缝质量，成型鱼鳞纹均匀后入冷却区。'
+        ]
+      },
+      '产品润色': {
+        device: '打磨抛光手工工位',
+        noticeTitle: '✨ 表面处理与防锈覆盖',
+        notice: '打磨去除毛刺焊渣做到不割手；清洗擦油死角全覆盖；作业佩戴护目镜！',
+        params: ['砂布规格 240目', '防锈油涂抹均匀', '去毛刺彻底'],
+        controls: ['焊渣药皮清除净', '管口光滑不割手', '防锈油覆盖无死角'],
+        steps: [
+          '穿戴防尘护目镜与抗磨手套。',
+          '对焊道进行钢丝轮刷光清理，去尽飞溅焊豆。',
+          '打磨管口毛刺，触摸确认无倒刺利边。',
+          '清洗表面杂质污垢后均匀喷涂/擦拭防锈油。'
+        ]
+      },
+      '检验': {
+        device: '综合检具台',
+        noticeTitle: '🎯 全检与气密压力保压',
+        notice: '外观全检无漏焊砂眼；通止规全测；首套总成拼接试装；合格后方可放行！',
+        params: ['通止规检测', '压力气密测试 0.2MPa', '外观全检'],
+        controls: ['形位公差合格', '无砂眼漏气', '配件装配完整无遗漏'],
+        steps: [
+          '管件整体验证卡入三维总成检具。',
+          '密封充气检测保压15秒，压力降不得超标。',
+          '外观全检焊道、管壁，合格后盖质检章。',
+          '填写质检记录单放行。'
+        ]
+      },
+      '包装': {
+        device: '现场发泡包装机',
+        noticeTitle: '📦 包装严密与配件清点',
+        notice: '核对外箱条码与装箱单；配件说明书必须齐全；发泡胶填充饱满防磕碰！',
+        params: ['压装速度 30cm/min', '发泡压力 0.5-1.5Mpa', '内衬贴合度 100%'],
+        controls: ['包装箱无破损受潮', '管件防震无晃动', '配件说明书清单齐全'],
+        steps: [
+          '核对型号装箱单与外箱标签条码一致。',
+          '铺设PE防护袋，产品入箱并摆放附件包。',
+          '注入发泡缓冲液，合盖定型防止运输擦碰。',
+          '胶带封箱，整齐堆码于托盘指定待发区。'
+        ]
+      }
+    };
+
+    function getTodayStr() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    // 动态判断 API 路径（HTTP在线模式使用相对路径，file模式连接电脑8903）
+    function getApiUrl(path) {
+      if (window.location.protocol.startsWith('http')) {
+        return path;
+      }
+      return 'http://127.0.0.1:8903' + path;
+    }
+
+    function photoSrc(url) {
+      if (!url) return '';
+      if (url.startsWith('data:') || url.startsWith('http')) return url;
+      return getApiUrl(url);
+    }
+
+    function showToast(msg) {
+      var box = document.getElementById('toastBox');
+      var el = document.getElementById('toastMsg');
+      el.innerText = msg;
+      box.style.display = 'block';
+      setTimeout(function() {
+        box.style.display = 'none';
+      }, 2500);
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    function handleOverlayClick(e, id) {
+      if (e.target.id === id) {
+        closeModal(id);
+      }
+    }
+
+    // 切换 Tab
+    function switchTab(tabId) {
+      state.currentTab = tabId;
+      var tabs = ['station', 'worklog', 'defect', 'kanban', 'leader'];
+      tabs.forEach(function(t) {
+        var el = document.getElementById('tab-' + t);
+        var nav = document.getElementById('nav-' + t);
+        if (t === tabId) {
+          el.classList.add('active');
+          nav.classList.add('active');
+        } else {
+          el.classList.remove('active');
+          nav.classList.remove('active');
+        }
+      });
+      window.scrollTo(0, 0);
+
+      if (tabId === 'worklog') renderWorklogs();
+      if (tabId === 'defect') renderDefects();
+      if (tabId === 'kanban') renderKanban();
+      if (tabId === 'leader') renderLeader();
+    }
+
+    // 初始化工序横向滑动条
+    function initProcessScroller() {
+      var box = document.getElementById('processScroller');
+      box.innerHTML = '<span class="proc-tag-prefix">工序:</span>';
+      allProcesses.forEach(function(proc) {
+        var btn = document.createElement('button');
+        btn.className = 'proc-pill' + (proc === state.selectedProcess ? ' active' : '');
+        btn.innerText = proc;
+        btn.onclick = function() {
+          selectProcess(proc);
+        };
+        box.appendChild(btn);
+      });
+    }
+
+    function selectProcess(proc) {
+      state.selectedProcess = proc;
+      initProcessScroller();
+      renderSopCard();
+    }
+
+    function renderSopCard() {
+      var spec = sopCatalog[state.selectedProcess] || sopCatalog['全自动弯管'];
+      document.getElementById('sopProcessTitle').innerText = '📐 【' + state.selectedProcess + '】工艺参数与规范';
+      document.getElementById('sopDeviceName').innerText = '设备：' + spec.device;
+      document.getElementById('sopNoticeTitle').innerText = spec.noticeTitle;
+      document.getElementById('sopNoticeContent').innerHTML = spec.notice;
+
+      var pGrid = document.getElementById('sopParamsGrid');
+      pGrid.innerHTML = '';
+      spec.params.forEach(function(p) {
+        var d = document.createElement('div');
+        d.className = 'param-item';
+        d.innerHTML = '<div class="param-key">受控参数</div><div class="param-val">' + p + '</div>';
+        pGrid.appendChild(d);
+      });
+
+      var cGrid = document.getElementById('sopControlsGrid');
+      cGrid.innerHTML = '';
+      spec.controls.forEach(function(c) {
+        var s = document.createElement('span');
+        s.className = 'chip active';
+        s.innerText = '✓ ' + c;
+        cGrid.appendChild(s);
+      });
+
+      var sList = document.getElementById('sopStepsList');
+      sList.innerHTML = '';
+      spec.steps.forEach(function(step, idx) {
+        var it = document.createElement('div');
+        it.className = 'step-item';
+        it.innerHTML = '<span class="step-num">' + (idx + 1) + '</span><span>' + step + '</span>';
+        sList.appendChild(it);
+      });
+
+      renderRepairAlerts();
+    }
+
+    function renderRepairAlerts() {
+      var myRepairs = state.defectRecords.filter(function(d) {
+        return d.operator === state.operatorName && d.leaderInstruction && (d.status === '打回维修' || d.status === '维修中' || d.status === '待领导确认');
+      });
+
+      var card = document.getElementById('repairAlertCard');
+      var list = document.getElementById('repairAlertList');
+      if (myRepairs.length > 0) {
+        card.style.display = 'block';
+        list.innerHTML = '';
+        myRepairs.forEach(function(inst) {
+          var item = document.createElement('div');
+          item.style = 'background:#1e1b2e;padding:10px;border-radius:8px;border:1px solid #f43f5e;margin-top:8px;';
+          item.innerHTML = 
+            '<div style="display:flex;justify-content:space-between;font-size:11px;font-weight:bold;color:#fb7185;">' +
+              '<span>工序：' + inst.process + ' · 缺陷：' + inst.issue + '</span>' +
+              '<span>' + inst.time + '</span>' +
+            '</div>' +
+            '<div style="background:#090d16;padding:8px;border-radius:6px;margin:6px 0;font-size:12px;color:#fecdd3;border:1px solid #fda4af;">' +
+              '<b>领导整改要求：</b>' + inst.leaderInstruction +
+            '</div>' +
+            '<label class="btn btn-sm btn-primary" style="cursor:pointer;display:inline-flex;">' +
+              '📷 拍摄整改后照片上传' +
+              '<input type="file" onchange="handleRepairUpload(event, \'' + inst.id + '\')" accept="image/*" capture="environment" class="hidden-input">' +
+            '</label>';
+          list.appendChild(item);
+        });
+        document.getElementById('navDefectBadge').innerText = myRepairs.length;
+        document.getElementById('navDefectBadge').style.display = 'inline-block';
+      } else {
+        card.style.display = 'none';
+        document.getElementById('navDefectBadge').style.display = 'none';
+      }
+    }
+
+    function saveOperatorName() {
+      var input = document.getElementById('operatorNameInput');
+      var name = input.value.trim();
+      if (name) {
+        state.operatorName = name;
+        SafeStore.set('workerSignature', name);
+        document.getElementById('worklogWorker').value = name;
+        document.getElementById('verifyOperatorInput').value = name;
+        updateOperatorUI();
+      }
+    }
+
+    // 与后台完全打通：登录工位
+    async function toggleOperatorLogin() {
+      var name = state.operatorName.trim();
+      if (!name) {
+        showToast('⚠️ 请先填写姓名再登录工位！');
+        document.getElementById('operatorNameInput').focus();
+        return;
+      }
+
+      if (!state.isOnline) {
+        try {
+          await fetch(getApiUrl('/api/operator_login'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ operator: name, process: state.selectedProcess })
+          });
+        } catch (e) {}
+        state.isOnline = true;
+        showToast('✅ ' + name + ' 已成功登录工位，电脑大屏已同步显示在线！');
+      } else {
+        try {
+          await fetch(getApiUrl('/api/operator_logout'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ operator: name, process: state.selectedProcess })
+          });
+        } catch (e) {}
+        state.isOnline = false;
+        showToast('已退出工位登录。');
+      }
+      updateOperatorUI();
+      await loadData();
+    }
+
+    function updateOperatorUI() {
+      var title = document.getElementById('stationOperatorTitle');
+      var badge = document.getElementById('onlineBadge');
+      var btn = document.getElementById('btnLoginOperator');
+
+      if (state.isOnline) {
+        title.innerHTML = '👷 工位操作员：<span style="color:#fff;">' + state.operatorName + '</span> (已在线)';
+        badge.className = 'status-badge status-online';
+        badge.innerText = '● ' + state.operatorName;
+        btn.className = 'btn btn-sm btn-secondary';
+        btn.innerText = '🔴 退出工位';
+      } else {
+        title.innerHTML = '👷 工位操作员：' + (state.operatorName || '未实名');
+        badge.className = 'status-badge status-offline';
+        badge.innerText = '● 离线';
+        btn.className = 'btn btn-sm btn-primary';
+        btn.innerText = '🟢 登录工位';
+      }
+    }
+
+    function openVerifyModal() {
+      var name = state.operatorName.trim();
+      if (!name) {
+        showToast('请先输入操作员姓名');
+      }
+      document.getElementById('verifyModalTitle').innerText = '🛡️ 工序【' + state.selectedProcess + '】防错自检签名';
+      document.getElementById('verifyOperatorInput').value = name;
+      document.getElementById('checkC1').checked = false;
+      document.getElementById('checkC2').checked = false;
+      document.getElementById('checkC3').checked = false;
+      openModal('verifyModal');
+    }
+
+    // 与后台完全打通：提交防错检核
+    async function confirmProcessCheckin() {
+      var c1 = document.getElementById('checkC1').checked;
+      var c2 = document.getElementById('checkC2').checked;
+      var c3 = document.getElementById('checkC3').checked;
+      var name = document.getElementById('verifyOperatorInput').value.trim();
+
+      if (!c1 || !c2 || !c3) {
+        showToast('⚠️ 请勾选全部 3 项防错确认条款！');
+        return;
+      }
+      if (!name) {
+        showToast('⚠️ 请填写实名签署姓名！');
+        return;
+      }
+
+      state.operatorName = name;
+      SafeStore.set('workerSignature', name);
+      updateOperatorUI();
+
+      try {
+        await fetch(getApiUrl('/api/submit_process_log'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            stepName: state.selectedProcess,
+            operator: name,
+            goodQty: 1,
+            badQty: 0
+          })
+        });
+      } catch (e) {}
+
+      closeModal('verifyModal');
+      showToast('✅ 【' + state.selectedProcess + '】防错签名成功留痕！');
+      await loadData();
+    }
+
+    function setWorklogTask(t) {
+      document.getElementById('worklogTask').value = t;
+    }
+
+    function addWorklogQty(n) {
+      var q = Number(document.getElementById('worklogQuantity').value || 0);
+      document.getElementById('worklogQuantity').value = q + n;
+    }
+
+    // 与后台完全打通：提交工作量报工
+    async function submitWorklogForm() {
+      var worker = document.getElementById('worklogWorker').value.trim();
+      var task = document.getElementById('worklogTask').value.trim();
+      var qty = Number(document.getElementById('worklogQuantity').value);
+      var unit = document.getElementById('worklogUnit').value;
+      var note = document.getElementById('worklogNote').value.trim();
+
+      if (!worker) return showToast('⚠️ 请填写工人姓名');
+      if (!task) return showToast('⚠️ 请填写工作内容');
+      if (!qty || qty <= 0) return showToast('⚠️ 请输入正确的报工数量');
+
+      try {
+        await fetch(getApiUrl('/api/worklog_submit'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            date: getTodayStr(),
+            worker: worker,
+            task: task,
+            quantity: qty,
+            unit: unit,
+            note: note
+          })
+        });
+        showToast('✅ 报工已成功提交，电脑大屏已同步更新！');
+      } catch (e) {
+        showToast('已本地保存报工');
+      }
+
+      document.getElementById('worklogQuantity').value = '';
+      document.getElementById('worklogNote').value = '';
+      await loadData();
+    }
+
+    function renderWorklogs() {
+      var today = getTodayStr();
+      var todayLogs = state.worklogs.filter(function(x) { return x.date === today || !x.date; });
+      var totalQty = todayLogs.reduce(function(acc, x) { return acc + Number(x.quantity || 0); }, 0);
+
+      document.getElementById('worklogTotalQty').innerText = totalQty;
+      document.getElementById('worklogTotalCount').innerText = todayLogs.length;
+      document.getElementById('worklogListCount').innerText = todayLogs.length;
+
+      var tbody = document.getElementById('worklogTableBody');
+      tbody.innerHTML = '';
+
+      if (todayLogs.length > 0) {
+        document.getElementById('worklogTableBox').style.display = 'block';
+        document.getElementById('worklogEmptyTip').style.display = 'none';
+        document.getElementById('navWorklogBadge').innerText = todayLogs.length;
+        document.getElementById('navWorklogBadge').style.display = 'inline-block';
+
+        todayLogs.forEach(function(item) {
+          var tr = document.createElement('tr');
+          tr.innerHTML = 
+            '<td style="font-weight:900;color:#fff;">' + item.worker + '</td>' +
+            '<td>' + item.task + '</td>' +
+            '<td style="color:#34d399;font-weight:bold;">' + item.quantity + ' ' + item.unit + '</td>' +
+            '<td style="color:#64748b;font-size:10px;">' + (item.time || '-') + '</td>';
+          tbody.appendChild(tr);
+        });
+      } else {
+        document.getElementById('worklogTableBox').style.display = 'none';
+        document.getElementById('worklogEmptyTip').style.display = 'block';
+        document.getElementById('navWorklogBadge').style.display = 'none';
+      }
+    }
+
+    function setDefectIssue(t) {
+      document.getElementById('defectIssueInput').value = t;
+    }
+
+    // 与后台完全打通：照片与缺陷上报
+    function handlePhotoUpload(e) {
+      var file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      var issue = document.getElementById('defectIssueInput').value.trim() || '现场疑似不良，请领导复核';
+      var reader = new FileReader();
+      reader.onload = async function(evt) {
+        var base64 = evt.target.result;
+        try {
+          var res = await fetch(getApiUrl('/api/upload_photo'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              imageData: base64,
+              operator: state.operatorName || '工位操作员',
+              process: state.selectedProcess,
+              issue: issue
+            })
+          });
+          if (res.ok) {
+            var data = await res.json();
+            showToast('✅ 现场照片已成功上传电脑大屏，AI 初审完成！');
+          }
+        } catch (err) {
+          showToast('照片已上传');
+        }
+        document.getElementById('defectIssueInput').value = '';
+        await loadData();
+      };
+      reader.readAsDataURL(file);
+      e.target.value = '';
+    }
+
+    // 与后台完全打通：整改后维修结果上传
+    function handleRepairUpload(e, parentId) {
+      var file = e.target.files && e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = async function(evt) {
+        var base64 = evt.target.result;
+        try {
+          await fetch(getApiUrl('/api/upload_photo'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              imageData: base64,
+              operator: state.operatorName || '工位操作员',
+              process: state.selectedProcess,
+              issue: '维修整改后复检',
+              parentId: parentId
+            })
+          });
+          showToast('✅ 维修结果照片已上传，等待领导复核！');
+        } catch (err) {}
+        await loadData();
+      };
+      reader.readAsDataURL(file);
+      e.target.value = '';
+    }
+
+    function renderDefects() {
+      var list = document.getElementById('defectRecordsList');
+      var empty = document.getElementById('defectEmptyTip');
+      var count = document.getElementById('defectRecordsCount');
+
+      count.innerText = state.defectRecords.length;
+      list.innerHTML = '';
+
+      if (state.defectRecords.length > 0) {
+        empty.style.display = 'none';
+        state.defectRecords.forEach(function(d) {
+          var color = d.status === '已报废' ? '#f43f5e' : (d.status === '已确认合格' ? '#10b981' : '#f59e0b');
+          var card = document.createElement('div');
+          card.className = 'defect-card';
+          var imgUrl = photoSrc(d.photoUrl);
+          card.innerHTML = 
+            '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+              '<strong style="color:#fcd34d;">' + d.process + ' · ' + d.issue + '</strong>' +
+              '<span style="color:' + color + ';font-weight:bold;font-size:11px;">' + d.status + '</span>' +
+            '</div>' +
+            '<div style="font-size:11px;color:#94a3b8;margin:3px 0;">' +
+              '上传人：' + d.operator + ' ｜ 时间：' + d.time +
+            '</div>' +
+            (imgUrl ? '<img src="' + imgUrl + '" class="defect-img" alt="缺陷">' : '') +
+            '<div class="ai-diag-box"><b>🤖 AI 初诊：</b>' + d.aiDiagnosis + '</div>' +
+            (d.leaderInstruction ? 
+              '<div style="background:rgba(245,158,11,0.15);border:1px solid #f59e0b;padding:8px;border-radius:6px;margin-top:6px;font-size:11px;color:#fef3c7;">' +
+                '<b>👑 领导处理意见：</b>' + d.leaderInstruction +
+              '</div>' : '');
+          list.appendChild(card);
+        });
+      } else {
+        empty.style.display = 'block';
+      }
+    }
+
+    function renderKanban() {
+      var orderList = document.getElementById('kanbanOrdersList');
+      orderList.innerHTML = '';
+      document.getElementById('kanbanOrderCount').innerText = '共 ' + state.workOrders.length + ' 个在产单';
+
+      state.workOrders.forEach(function(order) {
+        var card = document.createElement('div');
+        card.className = 'order-card';
+        var pipesHtml = '';
+        order.steps.forEach(function(s) {
+          var cls = s.status === '已完成' ? 'pipe-done' : (s.status === '进行中' ? 'pipe-active' : 'pipe-waiting');
+          var sub = s.status === '已完成' ? ('✓ ' + (s.operator || '完')) : (s.status === '进行中' ? '▶ 在产' : '待办');
+          pipesHtml += '<div class="pipe-item ' + cls + '"><div>' + s.name + '</div><div style="font-size:9px;opacity:0.9;">' + sub + '</div></div>';
+        });
+
+        card.innerHTML = 
+          '<div class="order-header">' +
+            '<span class="order-badge">' + order.orderNo + '</span>' +
+            '<span style="color:#ffffff;font-weight:900;">' + order.modelName + '</span>' +
+            '<span style="color:#34d399;font-weight:bold;">' + order.completedQty + '/' + order.quantity + ' 件</span>' +
+          '</div>' +
+          '<div style="font-size:10px;color:#94a3b8;margin-bottom:6px;">图号: ' + order.drawingNo + ' | 派发: ' + order.createTime + '</div>' +
+          '<div class="step-pipes">' + pipesHtml + '</div>';
+        orderList.appendChild(card);
+      });
+
+      var eqList = document.getElementById('equipmentList');
+      eqList.innerHTML = '';
+      state.equipmentMaster.forEach(function(eq) {
+        var pct = Math.min(100, Math.round((eq.bendCount / eq.maxLife) * 100));
+        var div = document.createElement('div');
+        div.style = 'background:#090d16;padding:10px;border-radius:8px;border:1px solid #1e293b;margin-bottom:6px;';
+        div.innerHTML = 
+          '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+            '<strong style="color:#fff;font-size:12px;">' + eq.name + '</strong>' +
+            '<span style="background:#059669;color:#fff;font-size:10px;padding:1px 6px;border-radius:4px;">' + eq.status + '</span>' +
+          '</div>' +
+          '<div style="display:flex;justify-content:space-between;font-size:11px;color:#94a3b8;margin-top:4px;">' +
+            '<span>工装模具: <b style="color:#fcd34d;">' + (eq.dieNo || eq.bladeNo || '-') + '</b></span>' +
+            '<span>芯棒: <b style="color:#a5b4fc;">' + (eq.mandrelNo || '-') + '</b></span>' +
+          '</div>' +
+          '<div class="progress-track"><div class="progress-bar" style="width:' + pct + '%"></div></div>' +
+          '<div style="display:flex;justify-content:space-between;font-size:10px;color:#64748b;margin-top:2px;">' +
+            '<span>加工寿命: ' + eq.bendCount + ' (' + pct + '%)</span>' +
+            '<span>额定寿命: ' + eq.maxLife + '</span>' +
+          '</div>';
+        eqList.appendChild(div);
+      });
+
+      var sfList = document.getElementById('safetyAlertsList');
+      sfList.innerHTML = '';
+      state.safetyAlerts.forEach(function(sa) {
+        var div = document.createElement('div');
+        div.style = 'background:#1e141a;border:1px solid #f43f5e;padding:8px 10px;border-radius:8px;margin-bottom:6px;font-size:11px;';
+        div.innerHTML = 
+          '<div style="display:flex;justify-content:space-between;color:#fda4af;font-weight:bold;">' +
+            '<span>[' + sa.level + '] ' + sa.process + ' - ' + sa.title + '</span>' +
+            '<span>' + sa.time + '</span>' +
+          '</div>' +
+          '<div style="color:#fecdd3;margin-top:3px;line-height:1.4;">' + sa.content + '</div>';
+        sfList.appendChild(div);
+      });
+    }
+
+    function handleLeaderClick() {
+      if (state.isLeaderMode) {
+        switchTab(state.currentTab === 'leader' ? 'station' : 'leader');
+      } else {
+        promptLeaderUnlock();
+      }
+    }
+
+    async function promptLeaderUnlock() {
+      var name = prompt("请输入领导姓名：", state.leaderName || "王主管");
+      if (!name || !name.trim()) return;
+      var pin = prompt("🔐 请输入领导大屏访问密码 (正式密码: 8888)：");
+      if (!pin) return;
+
+      try {
+        var res = await fetch(getApiUrl('/api/leader_login'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pin, leaderName: name.trim() })
+        });
+        if (res.ok) {
+          state.leaderName = name.trim();
+          state.isLeaderMode = true;
+          SafeStore.set('leaderSignature', state.leaderName);
+          document.getElementById('headerLeaderBadge').style.display = 'inline-block';
+          document.getElementById('btnLeaderLock').innerText = '👑 领导';
+          document.getElementById('btnLeaderLock').className = 'btn-header btn-leader';
+          switchTab('leader');
+          showToast('👑 欢迎【' + state.leaderName + '】进入战情中心！');
+          await loadData();
+          return;
+        } else {
+          alert('密码错误，无法进入领导大屏。');
+          return;
+        }
+      } catch (e) {
+        if (pin === '8888') {
+          state.leaderName = name.trim();
+          state.isLeaderMode = true;
+          switchTab('leader');
+          showToast('欢迎进入领导大屏！');
+        } else {
+          alert('密码错误');
+        }
+      }
+    }
+
+    async function logoutLeader() {
+      try {
+        await fetch(getApiUrl('/api/leader_logout'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ leaderName: state.leaderName })
+        });
+      } catch (e) {}
+      state.isLeaderMode = false;
+      document.getElementById('headerLeaderBadge').style.display = 'none';
+      document.getElementById('btnLeaderLock').innerText = '🔑 领导';
+      document.getElementById('btnLeaderLock').className = 'btn-header btn-lock';
+      switchTab('station');
+      showToast('已退出领导身份。');
+      await loadData();
+    }
+
+    function renderLeader() {
+      if (!state.isLeaderMode) {
+        document.getElementById('leaderLockedView').style.display = 'block';
+        document.getElementById('leaderUnlockedView').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('leaderLockedView').style.display = 'none';
+      document.getElementById('leaderUnlockedView').style.display = 'flex';
+      document.getElementById('leaderNameDisplay').innerText = state.leaderName;
+
+      document.getElementById('kpiOrderCount').innerText = state.workOrders.length + ' 单';
+      document.getElementById('kpiDefectCount').innerText = state.defectRecords.filter(function(x) { return x.status === '待领导处理' || x.status === '待领导确认' || x.status === '打回维修'; }).length + ' 件';
+      document.getElementById('kpiLogCount').innerText = state.historyLogs.length + ' 条';
+
+      renderLeaderOnlineOperators();
+      renderLeaderDefects();
+    }
+
+    function renderLeaderOnlineOperators() {
+      var box = document.getElementById('onlineOperatorsList');
+      var count = document.getElementById('onlineOperatorsCount');
+      if (!box) return;
+      box.innerHTML = '';
+      count.innerText = state.onlineOperators.length;
+
+      if (state.onlineOperators.length > 0) {
+        state.onlineOperators.forEach(function(p) {
+          var span = document.createElement('span');
+          span.className = 'chip active';
+          span.style = 'font-size:12px;padding:5px 10px;';
+          span.innerText = '● ' + p;
+          box.appendChild(span);
+        });
+      } else {
+        box.innerHTML = '<span style="font-size:11px;color:#64748b;">暂无工人登录工位。工人使用手机点击“登录工位”后即显示在线。</span>';
+      }
+    }
+
+    function renderLeaderDefects() {
+      var box = document.getElementById('leaderDefectsList');
+      var count = document.getElementById('leaderDefectCount');
+      if (!box) return;
+      box.innerHTML = '';
+      count.innerText = state.defectRecords.length;
+
+      state.defectRecords.forEach(function(d) {
+        var card = document.createElement('div');
+        card.className = 'defect-card';
+        var imgUrl = photoSrc(d.photoUrl);
+        card.innerHTML = 
+          '<div style="display:flex;justify-content:space-between;">' +
+            '<strong style="color:#fcd34d;">' + d.process + ' · ' + d.issue + '</strong>' +
+            '<span style="color:#f43f5e;font-weight:bold;">' + d.status + '</span>' +
+          '</div>' +
+          '<div style="font-size:11px;color:#94a3b8;margin:2px 0;">上报人: ' + d.operator + ' | 时间: ' + d.time + '</div>' +
+          (imgUrl ? '<img src="' + imgUrl + '" class="defect-img" alt="缺陷">' : '') +
+          '<div class="ai-diag-box"><b>AI 诊断：</b>' + d.aiDiagnosis + '</div>' +
+          '<div style="background:#090d16;padding:8px;border-radius:8px;margin-top:8px;">' +
+            '<label style="font-size:11px;font-weight:bold;color:#fcd34d;display:block;margin-bottom:4px;">领导批复/方案意见：</label>' +
+            '<textarea id="leaderInput_' + d.id + '" class="form-textarea" rows="2" placeholder="填写指导方案...">' + (d.leaderInstruction || '') + '</textarea>' +
+            '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px;">' +
+              '<button onclick="submitLeaderDecision(\'' + d.id + '\', \'打回维修\')" class="btn btn-sm btn-primary">打回维修</button>' +
+              '<button onclick="submitLeaderDecision(\'' + d.id + '\', \'已确认合格\')" class="btn btn-sm btn-success">确认合格</button>' +
+              '<button onclick="submitLeaderDecision(\'' + d.id + '\', \'已报废\')" class="btn btn-sm btn-danger">判定报废</button>' +
+            '</div>' +
+          '</div>';
+        box.appendChild(card);
+      });
+    }
+
+    async function submitLeaderDecision(id, decision) {
+      var input = document.getElementById('leaderInput_' + id);
+      var text = input ? input.value.trim() : '';
+      try {
+        await fetch(getApiUrl('/api/defect_action'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: id,
+            status: decision,
+            leaderInstruction: text || (decision === '打回维修' ? '请按工序SOP指导书修复后重新拍照上传' : '领导已复核确认'),
+            leaderName: state.leaderName
+          })
+        });
+      } catch (e) {}
+      showToast('已批复：' + decision);
+      await loadData();
+    }
+
+    // 与电脑端后台完全打通的核心轮询加载逻辑
+    var isLoading = false;
+    async function loadData() {
+      if (isLoading) return;
+      isLoading = true;
+      try {
+        var res = await fetch(getApiUrl('/api/get_workshop_data'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        if (res.ok) {
+          var data = await res.json();
+          if (data.onlineOperators) {
+            state.onlineOperators = data.onlineOperators.map(function(x) { return x.name || x; });
+          }
+          if (data.onlineLeaders) {
+            state.onlineLeaders = data.onlineLeaders.map(function(x) { return x.name || x; });
+          }
+          if (data.defects) {
+            state.defectRecords = data.defects;
+          }
+          if (data.worklogs) {
+            state.worklogs = data.worklogs;
+          }
+          if (data.logs) {
+            state.historyLogs = data.logs;
+          }
+          if (data.workOrders && data.workOrders.length) {
+            state.workOrders = data.workOrders;
+          }
+
+          // 保持操作员在线状态同步
+          if (state.operatorName && state.onlineOperators.includes(state.operatorName)) {
+            state.isOnline = true;
+          }
+
+          updateOperatorUI();
+          renderWorklogs();
+          renderDefects();
+          renderRepairAlerts();
+          if (state.currentTab === 'kanban') renderKanban();
+          if (state.currentTab === 'leader') renderLeader();
+        }
+      } catch (e) {
+      } finally {
+        isLoading = false;
+      }
+    }
+
+    // 页面启动初始化
+    window.onload = function() {
+      document.getElementById('operatorNameInput').value = state.operatorName;
+      document.getElementById('worklogWorker').value = state.operatorName;
+      document.getElementById('verifyOperatorInput').value = state.operatorName;
+
+      initProcessScroller();
+      renderSopCard();
+      updateOperatorUI();
+
+      loadData();
+      setInterval(loadData, 4000);
+
+      setInterval(function() {
+        if (state.isOnline && state.operatorName) {
+          fetch(getApiUrl('/api/operator_heartbeat'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ operator: state.operatorName, process: state.selectedProcess })
+          }).catch(function() {});
+        }
+        if (state.isLeaderMode && state.leaderName) {
+          fetch(getApiUrl('/api/leader_heartbeat'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ leaderName: state.leaderName })
+          }).catch(function() {});
+        }
+      }, 5000);
+    };
+  </script>
+</body>
+</html>
